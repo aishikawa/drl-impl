@@ -1,7 +1,9 @@
 import random
-from collections import deque
-from typing import List, Tuple
+from collections import deque, namedtuple
+from typing import Tuple
 import numpy as np
+
+Experience = namedtuple('Experience', field_names=['state', 'action', 'reward', 'next_state', 'done'])
 
 
 class ReplayBuffer:
@@ -10,12 +12,18 @@ class ReplayBuffer:
         random.seed(seed)
 
     def add(self, state, action, reward, next_state, done) -> None:
-        self.memory.append((state, action, reward, next_state, done))
+        e = Experience(state, action, reward, next_state, int(done))
+        self.memory.append(e)
 
     def sample(self, batch_size: int) -> Tuple:
         experiences = random.sample(self.memory, batch_size)
-        experiences = np.array(experiences)
-        return experiences[: 0], experiences[:, 1], experiences[:, 2], experiences[:, 3], experiences[:, 4]
+        batch = Experience(*zip(*experiences))
+        states = np.vstack(batch.state)
+        actions = np.vstack(batch.action)
+        rewards = np.vstack(batch.reward)
+        next_states = np.vstack(batch.next_state)
+        dones = np.vstack(batch.done)
+        return states, actions, rewards, next_states, dones
 
     def __len__(self):
         return len(self.memory)
