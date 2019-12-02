@@ -39,18 +39,18 @@ def main(seed=1):
         end = '\n' if i_episode % 100 == 0 else ''
         print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}', end=end)
 
-    plot_scores([scores, moving_scores])
+    plot_scores([scores, moving_scores], 'dqn_log.png')
 
 
-def plot_scores(scores_list):
+def plot_scores(scores_list, filename):
     n = np.arange(len(scores_list[0]))
     for scores in scores_list:
         plt.plot(n, scores)
     plt.ylabel('Score')
     plt.xlabel('Episode')
+    plt.savefig(filename)
     plt.show()
-    plt.savefig('dqn2.png')
 
 
 if __name__ == '__main__':
-    main()
+    main(11)
