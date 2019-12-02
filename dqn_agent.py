@@ -7,19 +7,20 @@ import torch.optim as optim
 
 
 class DqnAgent:
-    def __init__(self, state_size: int, action_size: int, batch_size=64, gamma=0.99, target_update_every=100):
+    def __init__(self, state_size: int, action_size: int, batch_size=64, gamma=0.99, target_update_every=100, seed=1):
         self.state_size = state_size
         self.action_size = action_size
         self.batch_size = batch_size
         self.gamma = gamma
         self.target_update_every = target_update_every
 
+        np.random.seed(seed)
         self.num_learn = 0
 
-        self.q_network = Network(state_size, action_size)
-        self.target_network = Network(state_size, action_size)
+        self.q_network = Network(state_size, action_size, seed)
+        self.target_network = Network(state_size, action_size, seed)
 
-        self.replay_memory = ReplayBuffer(buffer_size=10000, seed=1)
+        self.replay_memory = ReplayBuffer(buffer_size=10000, seed=seed)
 
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=1e-4)
 

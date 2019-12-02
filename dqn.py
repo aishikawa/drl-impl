@@ -6,12 +6,13 @@ from collections import deque
 import matplotlib.pyplot as plt
 
 
-def main():
+def main(seed=1):
     n_episodes = 2000
     max_t = 10000
     eps = 0.01
 
     env = gym.make('CartPole-v1')
+    env.seed(seed)
     agent = DqnAgent(state_size=env.observation_space.shape[0], action_size=env.action_space.n)
 
     scores = []

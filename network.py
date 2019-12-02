@@ -1,10 +1,12 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class Network(nn.Module):
-    def __init__(self, state_size, action_size):
+    def __init__(self, state_size, action_size, seed):
         super(Network, self).__init__()
+        torch.manual_seed(seed)
         hidden1 = 64
         hidden2 = 64
         self.fc1 = nn.Linear(state_size, hidden1)
