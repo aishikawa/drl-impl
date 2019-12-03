@@ -7,12 +7,17 @@ import torch.optim as optim
 
 
 class DqnAgent:
-    def __init__(self, state_size: int, action_size: int, batch_size=64, gamma=0.99, target_update_every=100, seed=1):
+    def __init__(self, state_size: int, action_size: int,
+                 batch_size=64, gamma=0.99,
+                 soft_target_update=False, target_update_every=100, soft_update_ratio=0.01,
+                 seed=1):
         self.state_size = state_size
         self.action_size = action_size
         self.batch_size = batch_size
         self.gamma = gamma
+        self.is_soft_target_update = soft_target_update
         self.target_update_every = target_update_every
+        self.soft_update_ratio = soft_update_ratio
 
         np.random.seed(seed)
         self.num_learn = 0
@@ -56,10 +61,16 @@ class DqnAgent:
         loss.backward()
         self.optimizer.step()
 
-        if self.num_learn % self.target_update_every:
+        if self.is_soft_target_update:
+            self.soft_target_update()
+        elif self.num_learn % self.target_update_every:
             self.target_update()
 
         self.num_learn += 1
 
     def target_update(self):
         self.target_network.load_state_dict(self.q_network.state_dict())
+
+    def soft_target_update(self):
+        for target_param, q_param in zip(self.target_network.parameters(), self.q_network.parameters()):
+            target_param.data.copy_(self.soft_update_ratio * q_param + (1 - self.soft_update_ratio) * target_param)
