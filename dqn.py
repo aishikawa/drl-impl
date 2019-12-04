@@ -9,7 +9,9 @@ import matplotlib.pyplot as plt
 def main(seed=1):
     n_episodes = 2000
     max_t = 10000
-    eps = 0.01
+    eps = 1
+    end_eps = 0.01
+    eps_decay = 0.995
 
     env = gym.make('CartPole-v1')
     env.seed(seed)
@@ -30,6 +32,8 @@ def main(seed=1):
             score += reward
             if done:
                 break
+
+        eps = max(eps * eps_decay, end_eps)
 
         scores_window.append(score)
         scores.append(score)
@@ -53,4 +57,4 @@ def plot_scores(scores_list, filename):
 
 
 if __name__ == '__main__':
-    main(11)
+    main(0)
