@@ -4,6 +4,7 @@ from dqn_agent import DqnAgent
 from collections import deque
 
 import matplotlib.pyplot as plt
+import time
 
 
 def main(seed=1):
@@ -20,14 +21,17 @@ def main(seed=1):
     scores = []
     moving_scores = []
     scores_window = deque(maxlen=100)
+    start_time = time.time()
+    total_steps = 0
 
     for i_episode in range(1, n_episodes+1):
         state = env.reset()
         score = 0
-        for t in range(max_t):
+        for _ in range(max_t):
             action = agent.act(state, eps)
             next_state, reward, done, _ = env.step(action)
             agent.step(state, action, reward, next_state, done)
+            total_steps += 1
             state = next_state
             score += reward
             if done:
@@ -39,9 +43,9 @@ def main(seed=1):
         scores.append(score)
         moving_score = np.mean(scores_window)
         moving_scores.append(moving_score)
-
+        steps_per_sec = total_steps / (time.time() - start_time)
         end = '\n' if i_episode % 100 == 0 else ''
-        print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}', end=end)
+        print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}\tSteps/sec: {steps_per_sec:.2f}', end=end)
 
     plot_scores([scores, moving_scores], 'dqn_log.png')
 
