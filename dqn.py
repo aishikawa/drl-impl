@@ -16,7 +16,12 @@ def main(seed=1):
 
     env = gym.make('CartPole-v1')
     env.seed(seed)
-    agent = DqnAgent(state_size=env.observation_space.shape[0], action_size=env.action_space.n, soft_target_update=True)
+    agent = DqnAgent(
+        state_size=env.observation_space.shape[0],
+        action_size=env.action_space.n,
+        soft_target_update=True,
+        double=True,
+    )
 
     scores = []
     moving_scores = []

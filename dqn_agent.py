@@ -13,6 +13,7 @@ class DqnAgent:
     def __init__(self, state_size: int, action_size: int,
                  batch_size=64, gamma=0.99,
                  soft_target_update=False, target_update_every=100, soft_update_ratio=0.001,
+                 double=False,
                  seed=1):
         self.state_size = state_size
         self.action_size = action_size
@@ -21,6 +22,7 @@ class DqnAgent:
         self.is_soft_target_update = soft_target_update
         self.target_update_every = target_update_every
         self.soft_update_ratio = soft_update_ratio
+        self.double = double
 
         np.random.seed(seed)
         self.num_learn = 0
@@ -58,7 +60,11 @@ class DqnAgent:
         n_states = n_states.float().to(device)
         dones = dones.float().to(device)
 
-        max_next_state_q = self.target_network(n_states).detach().max(1)[0].unsqueeze(1)
+        if self.double:
+            argmax = self.q_network(n_states).detach().argmax(1).unsqueeze(1)
+            max_next_state_q = self.target_network(n_states).detach().gather(1, argmax)
+        else:
+            max_next_state_q = self.target_network(n_states).detach().max(1)[0].unsqueeze(1)
         target = rewards + (self.gamma * max_next_state_q * (1 - dones))
         q = self.q_network(states).gather(1, actions)
         loss = F.mse_loss(q, target)
