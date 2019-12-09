@@ -6,6 +6,9 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+
 class DqnAgent:
     def __init__(self, state_size: int, action_size: int,
                  batch_size=64, gamma=0.99,
@@ -22,8 +25,8 @@ class DqnAgent:
         np.random.seed(seed)
         self.num_learn = 0
 
-        self.q_network = Network(state_size, action_size, seed)
-        self.target_network = Network(state_size, action_size, seed)
+        self.q_network = Network(state_size, action_size, seed).to(device)
+        self.target_network = Network(state_size, action_size, seed).to(device)
 
         self.replay_memory = ReplayBuffer(buffer_size=100000, seed=seed)
 
@@ -36,12 +39,12 @@ class DqnAgent:
 
     def act(self, state, epsilon):
         if np.random.rand() > epsilon:
-            state = torch.from_numpy(state).float().unsqueeze(0)
+            state = torch.from_numpy(state).float().unsqueeze(0).to(device)
             self.q_network.eval()
             with torch.no_grad():
                 action_values = self.q_network(state)
             self.q_network.train()
-            action = np.argmax(action_values.data.numpy())
+            action = np.argmax(action_values.cpu().data.numpy())
         else:
             action = np.random.randint(self.action_size)
         return action
@@ -49,10 +52,11 @@ class DqnAgent:
     def learn(self):
         batch = self.replay_memory.sample(self.batch_size)
         states, actions, rewards, n_states, dones = (torch.from_numpy(v) for v in batch)
-        states = states.float()
-        rewards = rewards.float()
-        n_states = n_states.float()
-        dones = dones.float()
+        states = states.float().to(device)
+        actions = actions.to(device)
+        rewards = rewards.float().to(device)
+        n_states = n_states.float().to(device)
+        dones = dones.float().to(device)
 
         max_next_state_q = self.target_network(n_states).detach().max(1)[0].unsqueeze(1)
         target = rewards + (self.gamma * max_next_state_q * (1 - dones))
