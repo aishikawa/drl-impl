@@ -21,6 +21,7 @@ def main(seed=1):
         action_size=env.action_space.n,
         soft_target_update=True,
         double=True,
+        duel=True,
     )
 
     scores = []

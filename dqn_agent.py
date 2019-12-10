@@ -1,4 +1,4 @@
-from network import Network
+from network import Network, DuelingNetwork
 from replay_buffer import ReplayBuffer
 import numpy as np
 import torch
@@ -14,6 +14,7 @@ class DqnAgent:
                  batch_size=64, gamma=0.99,
                  soft_target_update=False, target_update_every=100, soft_update_ratio=0.001,
                  double=False,
+                 duel=False,
                  seed=1):
         self.state_size = state_size
         self.action_size = action_size
@@ -27,8 +28,12 @@ class DqnAgent:
         np.random.seed(seed)
         self.num_learn = 0
 
-        self.q_network = Network(state_size, action_size, seed).to(device)
-        self.target_network = Network(state_size, action_size, seed).to(device)
+        if duel:
+            self.q_network = DuelingNetwork(state_size, action_size, seed).to(device)
+            self.target_network = DuelingNetwork(state_size, action_size, seed).to(device)
+        else:
+            self.q_network = Network(state_size, action_size, seed).to(device)
+            self.target_network = Network(state_size, action_size, seed).to(device)
 
         self.replay_memory = ReplayBuffer(buffer_size=100000, seed=seed)
 
