@@ -34,10 +34,11 @@ class DqnAgent:
         else:
             self.q_network = Network(state_size, action_size, seed).to(device)
             self.target_network = Network(state_size, action_size, seed).to(device)
+        self.target_update()
 
         self.replay_memory = ReplayBuffer(buffer_size=100000, seed=seed)
 
-        self.optimizer = optim.Adam(self.q_network.parameters(), lr=1e-4)
+        self.optimizer = optim.Adam(self.q_network.parameters(), lr=5e-4)
 
     def step(self, state, action, reward, next_state, done):
         self.replay_memory.add(state, action, reward, next_state, done)
@@ -73,6 +74,7 @@ class DqnAgent:
         target = rewards + (self.gamma * max_next_state_q * (1 - dones))
         q = self.q_network(states).gather(1, actions)
         loss = F.mse_loss(q, target)
+        self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 
