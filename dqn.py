@@ -8,13 +8,14 @@ import time
 
 
 def main(seed=1):
-    n_episodes = 2000
-    max_t = 10000
+    n_episodes = 1000
+    max_t = 1000
     eps = 1
     end_eps = 0.01
     eps_decay = 0.995
 
-    env = gym.make('CartPole-v1')
+    env_name = 'CartPole-v1'
+    env = gym.make(env_name)
     env.seed(seed)
     agent = DqnAgent(
         state_size=env.observation_space.shape[0],
@@ -22,6 +23,7 @@ def main(seed=1):
         soft_target_update=True,
         double=True,
         duel=True,
+        seed=seed
     )
 
     scores = []
@@ -53,13 +55,14 @@ def main(seed=1):
         end = '\n' if i_episode % 100 == 0 else ''
         print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}\tSteps/sec: {steps_per_sec:.2f}', end=end)
 
-    plot_scores([scores, moving_scores], 'dqn_log.png')
+    plot_scores(env_name, [scores, moving_scores], 'dqn_log.png')
 
 
-def plot_scores(scores_list, filename):
+def plot_scores(env_name, scores_list, filename):
     n = np.arange(len(scores_list[0]))
     for scores in scores_list:
         plt.plot(n, scores)
+    plt.title(env_name)
     plt.ylabel('Score')
     plt.xlabel('Episode')
     plt.savefig(filename)
