@@ -52,7 +52,11 @@ def main(seed=1):
         moving_score = np.mean(scores_window)
         moving_scores.append(moving_score)
         steps_per_sec = total_steps / (time.time() - start_time)
-        end = '\n' if i_episode % 100 == 0 else ''
+        if i_episode % 100 == 0:
+            plot_scores(env_name, [scores, moving_scores], f'dqn_log_{env_name}_{i_episode}.png')
+            end = '\n'
+        else:
+            end = ''
         print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}\tSteps/sec: {steps_per_sec:.2f}', end=end)
 
     plot_scores(env_name, [scores, moving_scores], 'dqn_log.png')
