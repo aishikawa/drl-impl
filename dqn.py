@@ -60,6 +60,7 @@ def main(seed=1):
         print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}\tSteps/sec: {steps_per_sec:.2f}', end=end)
 
     plot_scores(env_name, [scores, moving_scores], 'dqn_log.png')
+    agent.save_network('network.pth')
 
 
 def plot_scores(env_name, scores_list, filename):
