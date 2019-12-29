@@ -94,3 +94,7 @@ class DqnAgent:
 
     def save_network(self, filename):
         torch.save(self.q_network.state_dict(), filename)
+
+    def load_network(self, filename):
+        self.q_network.load_state_dict(torch.load(filename))
+        self.target_update()
