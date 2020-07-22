@@ -1,5 +1,5 @@
-from network import Network, DuelingNetwork
-from replay_buffer import ReplayBuffer
+from dqn.network import Network, DuelingNetwork
+from dqn.replay_buffer import ReplayBuffer
 import numpy as np
 import torch
 import torch.nn.functional as F

@@ -1,6 +1,6 @@
 import gym
 import numpy as np
-from dqn_agent import DqnAgent
+from dqn.dqn_agent import DqnAgent
 from collections import deque
 
 import matplotlib.pyplot as plt
