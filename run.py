@@ -53,14 +53,13 @@ def main(seed=1):
         moving_scores.append(moving_score)
         steps_per_sec = total_steps / (time.time() - start_time)
         if i_episode % 100 == 0:
-            plot_scores(env_name, [scores, moving_scores], f'graphs/dqn_log_{env_name}_{i_episode}.png')
             end = '\n'
         else:
             end = ''
         print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}\tSteps/sec: {steps_per_sec:.2f}', end=end)
 
-    plot_scores(env_name, [scores, moving_scores], 'graphs/dqn_log.png')
-    agent.save_network('networks/network.pth')
+    plot_scores(env_name, [scores, moving_scores], 'result/dqn_log.png')
+    agent.save_network('result/network.pth')
 
 
 def plot_scores(env_name, scores_list, filename):
