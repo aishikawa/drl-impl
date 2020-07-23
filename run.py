@@ -8,7 +8,7 @@ import time
 
 
 def main(seed=1):
-    n_episodes = 1000
+    n_episodes = 1001
     max_t = 1000
     eps = 1
     end_eps = 0.01
@@ -17,6 +17,7 @@ def main(seed=1):
     env_name = 'CartPole-v1'
     env = gym.make(env_name)
     env.seed(seed)
+    env = gym.wrappers.Monitor(env, 'result/video', force=True)
     agent = DqnAgent(
         state_size=env.observation_space.shape[0],
         action_size=env.action_space.n,
