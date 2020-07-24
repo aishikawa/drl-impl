@@ -17,7 +17,7 @@ def main(seed=1):
     env_name = 'CartPole-v1'
     env = gym.make(env_name)
     env.seed(seed)
-    env = gym.wrappers.Monitor(env, 'result/video', force=True)
+    env = gym.wrappers.Monitor(env, 'result/dqn/video', force=True)
     agent = DqnAgent(
         state_size=env.observation_space.shape[0],
         action_size=env.action_space.n,
@@ -59,8 +59,8 @@ def main(seed=1):
             end = ''
         print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}\tSteps/sec: {steps_per_sec:.2f}', end=end)
 
-    plot_scores(env_name, [scores, moving_scores], 'result/dqn_log.png')
-    agent.save_network('result/network.pth')
+    plot_scores(env_name, [scores, moving_scores], 'result/dqn/log.png')
+    agent.save_network('result/dqn/network.pth')
 
 
 def plot_scores(env_name, scores_list, filename):
