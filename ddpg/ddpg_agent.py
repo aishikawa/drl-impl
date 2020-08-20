@@ -47,7 +47,7 @@ class DdpgAgent:
             action +=  self.noise.sample()
         return np.clip(action, -1, 1)
 
-    def reset(self):
+    def end_episode(self):
         self.noise.reset()
 
     def learn(self):

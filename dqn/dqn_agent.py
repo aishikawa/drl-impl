@@ -40,13 +40,15 @@ class DqnAgent:
 
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=5e-4)
 
+        self.epsilon = 1
+
     def step(self, state, action, reward, next_state, done):
         self.replay_memory.add(state, action, reward, next_state, done)
         if len(self.replay_memory) >= self.batch_size:
             self.learn()
 
-    def act(self, state, epsilon):
-        if np.random.rand() > epsilon:
+    def act(self, state):
+        if np.random.rand() > self.epsilon:
             state = torch.from_numpy(state).float().unsqueeze(0).to(device)
             self.q_network.eval()
             with torch.no_grad():
@@ -56,6 +58,9 @@ class DqnAgent:
         else:
             action = np.random.randint(self.action_size)
         return action
+
+    def end_episode(self):
+        self.epsilon = max(self.epsilon * 0.995, 0.01)
 
     def learn(self):
         batch = self.replay_memory.sample(self.batch_size)
