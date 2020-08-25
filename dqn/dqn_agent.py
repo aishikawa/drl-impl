@@ -97,8 +97,8 @@ class DqnAgent:
         for target_param, q_param in zip(self.target_network.parameters(), self.q_network.parameters()):
             target_param.data.copy_(self.soft_update_ratio * q_param + (1 - self.soft_update_ratio) * target_param)
 
-    def save_network(self, filename):
-        torch.save(self.q_network.state_dict(), filename)
+    def save_network(self, save_dir):
+        torch.save(self.q_network.state_dict(), f'{save_dir}/network.pth')
 
     def load_network(self, filename):
         self.q_network.load_state_dict(torch.load(filename))
