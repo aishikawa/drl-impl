@@ -36,6 +36,7 @@ class SumTree:
         self.capacity = capacity
         self.tree = np.zeros(2*capacity-1)
         self.data = np.zeros(capacity, dtype=object)
+        self.max_priority = 0
 
     def _update(self, index, change):
         parent = (index - 1) // 2
@@ -67,6 +68,7 @@ class SumTree:
     def update_priority(self, index, priority):
         self.max_priority = max(priority, self.max_priority)
         change = priority - self.tree[index]
+        self.tree[index] = priority
         self._update(index, change)
 
     def get(self, r):
