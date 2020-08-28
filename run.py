@@ -24,7 +24,7 @@ def make_env_and_agent(algo, seed):
         agent = DdpgAgent(state_dim, action_dim, gamma=0.99, random_seed=seed)
 
     env.seed(0)
-    env = gym.wrappers.Monitor(env, f'result/{algo}/video/', force=True)
+    env = gym.wrappers.Monitor(env, f'result/{algo}/video/', force=True, video_callable=lambda x: x % 100 == 0)
 
     return env, env_name, agent
 
