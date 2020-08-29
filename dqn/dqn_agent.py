@@ -25,7 +25,6 @@ class DqnAgent:
         self.soft_update_ratio = soft_update_ratio
         self.double = double
 
-        np.random.seed(seed)
         self.num_learn = 0
 
         if duel:
@@ -36,7 +35,7 @@ class DqnAgent:
             self.target_network = Network(state_size, action_size, seed).to(device)
         self.target_update()
 
-        self.replay_memory = ReplayBuffer(buffer_size=100000, seed=seed)
+        self.replay_memory = ReplayBuffer(buffer_size=100000)
 
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=5e-4)
 

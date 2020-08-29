@@ -4,12 +4,16 @@ import matplotlib.pyplot as plt
 from collections import deque
 import time
 import argparse
+import random
 
 from dqn.dqn_agent import DqnAgent
 from ddpg.ddpg_agent import DdpgAgent
 
 
 def make_env_and_agent(algo, seed):
+    np.random.seed(seed)
+    random.seed(seed)
+
     if algo == 'DQN':
         env_name = 'LunarLander-v2'
         env = gym.make(env_name)
@@ -23,7 +27,7 @@ def make_env_and_agent(algo, seed):
         action_dim = env.action_space.shape[0]
         agent = DdpgAgent(state_dim, action_dim, gamma=0.99, random_seed=seed)
 
-    env.seed(0)
+    env.seed(seed)
     env = gym.wrappers.Monitor(env, f'result/{algo}/video/', force=True, video_callable=lambda x: x % 100 == 0)
 
     return env, env_name, agent

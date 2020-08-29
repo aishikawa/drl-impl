@@ -1,6 +1,5 @@
 from ddpg.replay_buffer import ReplayBuffer
 from ddpg.network import ActorNetwork, CriticNetwork
-import random
 import copy
 import numpy as np
 import torch
@@ -24,9 +23,9 @@ class DdpgAgent:
         self.critic_target = CriticNetwork(state_size, action_size, random_seed).to(device)
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=lr_critic, weight_decay=weight_decay)
 
-        self.noise = OUNoise(action_size, random_seed)
+        self.noise = OUNoise(action_size)
 
-        self.memory = ReplayBuffer(buffer_size, random_seed)
+        self.memory = ReplayBuffer(buffer_size)
 
         self.batch_size = batch_size
 
@@ -91,12 +90,11 @@ class OUNoise:
     """
     Ornstein-Uhlenbeck process.
     """
-    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
+    def __init__(self, size, mu=0., theta=0.15, sigma=0.2):
         self.size = size
         self.mu = mu * np.ones(size)
         self.theta = theta
         self.sigma = sigma
-        random.seed(seed)
 
         self.state = copy.copy(self.mu)
 

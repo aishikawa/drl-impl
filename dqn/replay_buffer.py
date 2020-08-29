@@ -7,9 +7,8 @@ Experience = namedtuple('Experience', field_names=['state', 'action', 'reward', 
 
 
 class ReplayBuffer:
-    def __init__(self, buffer_size: int, seed: int):
+    def __init__(self, buffer_size: int):
         self.memory = deque(maxlen=buffer_size)
-        random.seed(seed)
 
     def add(self, state, action, reward, next_state, done) -> None:
         e = Experience(state, action, reward, next_state, int(done))
