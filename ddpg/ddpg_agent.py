@@ -10,8 +10,8 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 class DdpgAgent:
-    def __init__(self, state_size, action_size, gamma, random_seed, buffer_size=100000, batch_size=64,
-                 soft_update_ratio=0.001, lr_actor=3e-4, lr_critic=3e-4, weight_decay=1e-6):
+    def __init__(self, state_size, action_size, gamma, random_seed, buffer_size=100000, batch_size=128,
+                 soft_update_ratio=0.001, lr_actor=3e-4, lr_critic=3e-4, weight_decay=0):
         self.gamma = gamma
         self.soft_update_ratio = soft_update_ratio
 
@@ -43,7 +43,7 @@ class DdpgAgent:
         self.actor.train()
         action = action.cpu().data.numpy()
         if add_noise:
-            action +=  self.noise.sample()
+            action += self.noise.sample()
         return np.clip(action, -1, 1)
 
     def end_episode(self):
