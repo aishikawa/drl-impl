@@ -6,6 +6,6 @@ This is implementations of deep reinforcement learning algorithms.
 - [x] DQN
     - [x] Double Q-learning
     - [x] Dueling Network
-    - [ ] Prioritised Replay
+    - [x] Prioritised Replay
     - [ ] Multi-step learning
 - [x] DDPG
