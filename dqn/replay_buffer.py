@@ -7,23 +7,40 @@ Experience = namedtuple('Experience', field_names=['state', 'action', 'reward', 
 
 
 class ReplayBuffer:
-    def __init__(self, buffer_size: int, seed: int):
-        self.memory = deque(maxlen=buffer_size)
+    def __init__(self, buffer_size: int, seed: int, alpha: float, initial_beta: float):
+        self.memory = SumTree(buffer_size)
         random.seed(seed)
+
+        self.alpha = alpha
+        self.beta = initial_beta
 
     def add(self, state, action, reward, next_state, done) -> None:
         e = Experience(state, action, reward, next_state, int(done))
-        self.memory.append(e)
+        self.memory.add(e, self.memory.max_priority)
 
     def sample(self, batch_size: int) -> Tuple:
-        experiences = random.sample(self.memory, batch_size)
+        total_priority = self.memory.total_priority()
+        rands = np.random.rand(batch_size) * total_priority
+        experiences = [self.memory.get(r) for r in rands]
+
+        indexes, priorities, experiences = zip(*experiences)
         batch = Experience(*zip(*experiences))
+
         states = np.vstack(batch.state)
         actions = np.vstack(batch.action)
         rewards = np.vstack(batch.reward)
         next_states = np.vstack(batch.next_state)
         dones = np.vstack(batch.done)
-        return states, actions, rewards, next_states, dones
+
+        probabilities = priorities / self.memory.total_priority()
+        weights = np.power(len(self.memory) * probabilities, -self.beta)
+        weights = weights / weights.max()
+
+        return (states, actions, rewards, next_states, dones), indexes, weights
+
+    def update_priorities(self, indexes, new_priorities):
+        for i, p in zip(indexes, new_priorities**self.alpha):
+            self.memory.update_priority(i, p)
 
     def __len__(self):
         return len(self.memory)
@@ -36,13 +53,15 @@ class SumTree:
         self.capacity = capacity
         self.tree = np.zeros(2*capacity-1)
         self.data = np.zeros(capacity, dtype=object)
-        self.max_priority = 0
+        self.max_priority = 1
 
-    def _update(self, index, change):
+    def _update(self, index):
         parent = (index - 1) // 2
-        self.tree[parent] += change
+        left = 2*parent+1
+        right = left+1
+        self.tree[parent] = self.tree[left] + self.tree[right]
         if parent != 0:
-            self._update(parent, change)
+            self._update(parent)
 
     def _get(self, index, r):
         left = 2*index+1
@@ -67,9 +86,8 @@ class SumTree:
 
     def update_priority(self, index, priority):
         self.max_priority = max(priority, self.max_priority)
-        change = priority - self.tree[index]
         self.tree[index] = priority
-        self._update(index, change)
+        self._update(index)
 
     def get(self, r):
         """
