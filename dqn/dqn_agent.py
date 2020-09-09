@@ -66,6 +66,7 @@ class DqnAgent:
 
     def end_episode(self):
         self.epsilon = max(self.epsilon * 0.995, 0.01)
+        self.replay_memory.beta = min(self.pr_max_beta, self.replay_memory.beta + 0.001)
 
     def learn(self):
         batch, indexes, weights = self.replay_memory.sample(self.batch_size)
