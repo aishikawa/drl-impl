@@ -17,6 +17,7 @@ class DqnAgent:
                  pr_alpha=0.5,
                  pr_initial_beta=0.4,
                  pr_max_beta=1.0,
+                 multi_step=3,
                  seed=1):
         self.state_size = state_size
         self.action_size = action_size
@@ -37,7 +38,8 @@ class DqnAgent:
             self.target_network = Network(state_size, action_size, seed).to(device)
         self.target_update()
 
-        self.replay_memory = ReplayBuffer(buffer_size=2**17, seed=seed, alpha=pr_alpha, initial_beta=pr_initial_beta)
+        self.replay_memory = ReplayBuffer(buffer_size=2**17, seed=seed, alpha=pr_alpha, initial_beta=pr_initial_beta,
+                                          n_step=multi_step, gamma=gamma)
 
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=5e-4)
 
@@ -46,6 +48,8 @@ class DqnAgent:
         self.pr_alpha = pr_alpha
         self.pr_initial_beta = pr_initial_beta
         self.pr_max_beta = pr_max_beta
+
+        self.multi_step = multi_step
 
     def step(self, state, action, reward, next_state, done):
         self.replay_memory.add(state, action, reward, next_state, done)
@@ -84,7 +88,8 @@ class DqnAgent:
             max_next_state_q = self.target_network(n_states).detach().gather(1, argmax)
         else:
             max_next_state_q = self.target_network(n_states).detach().max(1)[0].unsqueeze(1)
-        target = rewards + (self.gamma * max_next_state_q * (1 - dones))
+
+        target = rewards + (self.gamma**self.multi_step * max_next_state_q * (1 - dones))
         q = self.q_network(states).gather(1, actions)
         loss = torch.abs_(q - target)
         new_priorities = loss.detach().cpu().numpy() + 1e-3

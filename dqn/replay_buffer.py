@@ -7,16 +7,39 @@ Experience = namedtuple('Experience', field_names=['state', 'action', 'reward', 
 
 
 class ReplayBuffer:
-    def __init__(self, buffer_size: int, seed: int, alpha: float, initial_beta: float):
+    def __init__(self, buffer_size: int, seed: int, alpha: float, initial_beta: float, n_step: int, gamma: float):
         self.memory = SumTree(buffer_size)
         random.seed(seed)
 
         self.alpha = alpha
         self.beta = initial_beta
 
+        self.n_step = n_step
+        self.transitions = deque(maxlen=n_step)
+
+        self.gamma = gamma
+
     def add(self, state, action, reward, next_state, done) -> None:
         e = Experience(state, action, reward, next_state, int(done))
-        self.memory.add(e, self.memory.max_priority)
+        self.transitions.append(e)
+
+        if done:
+            while self.transitions:
+                self.memory.add(self.make_n_step_transition(), self.memory.max_priority)
+                self.transitions.popleft()
+        elif len(self.transitions) == self.n_step:
+            self.memory.add(self.make_n_step_transition(), self.memory.max_priority)
+
+    def make_n_step_transition(self):
+        state = self.transitions[0][0]
+        action = self.transitions[0][1]
+        reward = 0
+        for i, t in enumerate(self.transitions):
+            reward += t[2] * self.gamma**i
+        next_state = self.transitions[-1][3]
+        done = self.transitions[-1][4]
+
+        return state, action, reward, next_state, done
 
     def sample(self, batch_size: int) -> Tuple:
         total_priority = self.memory.total_priority()
