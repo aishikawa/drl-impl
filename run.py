@@ -86,7 +86,7 @@ def main():
             end = ''
         print(f'\rEpisode {i_episode}\tAverage Score: {moving_score:.2f}\tSteps/sec: {steps_per_sec:.2f}', end=end)
 
-    plot_scores(env_name, [scores, moving_scores], f'result/{args.algo}/log.png')
+    plot_scores(env_name, [moving_scores], f'result/{args.algo}/log.png')
     agent.save_network(f'result/{args.algo}')
 
 
