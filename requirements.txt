@@ -1,5 +1,5 @@
 box2d-py==2.3.8
-certifi==2021.10.8
+certifi==2022.12.7
 cloudpickle==2.0.0
 cycler==0.11.0
 fonttools==4.28.5
