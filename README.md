@@ -1,5 +1,5 @@
 # drl-impl
-This is implementations of deep reinforcement learning algorithms.
+This is an implementation of deep reinforcement learning algorithms.
 
 
 ### Algorithms
@@ -16,12 +16,12 @@ $ pip install -r requirements.txt
 ```
 
 ## Usage
-Run DQN for [LunarLander-v2](https://gym.openai.com/envs/LunarLander-v2/)
+Run DQN for [LunarLander-v2](https://gymnasium.farama.org/environments/box2d/lunar_lander/)
 ```
 $ python run.py --algo DQN
 ```
 
-Run DDPG for [LunarLanderContinuous-v2](https://gym.openai.com/envs/LunarLanderContinuous-v2/)
+Run DDPG for [LunarLanderContinuous-v2](https://gymnasium.farama.org/environments/box2d/lunar_lander/)
 ```
 $ python run.py --algo DDPG
 ```

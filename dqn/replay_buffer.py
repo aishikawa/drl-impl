@@ -55,15 +55,16 @@ class ReplayBuffer:
         next_states = np.vstack(batch.next_state)
         dones = np.vstack(batch.done)
 
-        probabilities = priorities / self.memory.total_priority()
+        probabilities = np.array(priorities) / self.memory.total_priority()
         weights = np.power(len(self.memory) * probabilities, -self.beta)
         weights = weights / weights.max()
 
         return (states, actions, rewards, next_states, dones), indexes, weights
 
     def update_priorities(self, indexes, new_priorities):
-        for i, p in zip(indexes, new_priorities**self.alpha):
-            self.memory.update_priority(i, p)
+        priorities = np.asarray(new_priorities).flatten() ** self.alpha
+        for i, p in zip(indexes, priorities):
+            self.memory.update_priority(i, float(p))
 
     def __len__(self):
         return len(self.memory)
@@ -108,6 +109,7 @@ class SumTree:
         self.size = min(self.size, self.capacity)
 
     def update_priority(self, index, priority):
+        priority = float(np.squeeze(priority))
         self.max_priority = max(priority, self.max_priority)
         self.tree[index] = priority
         self._update(index)

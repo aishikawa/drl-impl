@@ -1,10 +1,11 @@
-import gym
+import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import deque
 import time
 import argparse
 import random
+import os
 
 from dqn.dqn_agent import DqnAgent
 from ddpg.ddpg_agent import DdpgAgent
@@ -15,25 +16,30 @@ def make_env_and_agent(algo, seed):
     random.seed(seed)
 
     if algo == 'DQN':
-        env_name = 'LunarLander-v2'
-        env = gym.make(env_name)
+        env_name = 'LunarLander-v3'
+        env = gym.make(env_name, render_mode='rgb_array')
         state_dim = env.observation_space.shape[0]
         action_size = env.action_space.n
         agent = DqnAgent(state_dim, action_size, gamma=0.99, soft_target_update=True, double=True, duel=True, seed=seed)
     elif algo == 'DDPG':
-        env_name = 'LunarLanderContinuous-v2'
-        env = gym.make(env_name)
+        env_name = 'LunarLanderContinuous-v3'
+        env = gym.make(env_name, render_mode='rgb_array')
         state_dim = env.observation_space.shape[0]
         action_dim = env.action_space.shape[0]
         agent = DdpgAgent(state_dim, action_dim, gamma=0.99, random_seed=seed)
 
-    env.seed(seed)
-    env = gym.wrappers.Monitor(env, f'result/{algo}/video/', force=True, video_callable=lambda x: x % 100 == 0)
+    env = gym.wrappers.RecordVideo(
+        env,
+        video_folder=f'result/{algo}/video',
+        episode_trigger=lambda ep_id: ep_id % 100 == 0,
+        disable_logger=True
+    )
 
     return env, env_name, agent
 
 
 def plot_scores(env_name, scores_list, filename):
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     n = np.arange(len(scores_list[0]))
     for scores in scores_list:
         plt.plot(n, scores)
@@ -49,7 +55,8 @@ def main():
     parser.add_argument('--algo', choices=['DQN', 'DDPG'], default='DDPG')
 
     args = parser.parse_args()
-    env, env_name, agent = make_env_and_agent(args.algo, seed=1)
+    seed=1
+    env, env_name, agent = make_env_and_agent(args.algo, seed=seed)
 
     n_episodes = 1001
     max_t = 1000
@@ -61,11 +68,12 @@ def main():
     total_steps = 0
 
     for i_episode in range(1, n_episodes+1):
-        state = env.reset()
+        state, _ = env.reset(seed=seed) if i_episode == 1 else env.reset()
         score = 0
         for _ in range(max_t):
             action = agent.act(state)
-            next_state, reward, done, _ = env.step(action)
+            next_state, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
             agent.step(state, action, reward, next_state, done)
             total_steps += 1
             state = next_state
@@ -88,6 +96,7 @@ def main():
 
     plot_scores(env_name, [moving_scores], f'result/{args.algo}/log.png')
     agent.save_network(f'result/{args.algo}')
+    env.close()
 
 
 if __name__ == '__main__':

@@ -81,7 +81,7 @@ class DqnAgent:
         n_states = n_states.float().to(device)
         dones = dones.float().to(device)
 
-        weights = torch.from_numpy(weights).float().to(device)
+        weights = torch.from_numpy(weights).float().to(device).unsqueeze(1)
 
         if self.double:
             argmax = self.q_network(n_states).detach().argmax(1).unsqueeze(1)
@@ -92,7 +92,7 @@ class DqnAgent:
         target = rewards + (self.gamma**self.multi_step * max_next_state_q * (1 - dones))
         q = self.q_network(states).gather(1, actions)
         loss = torch.abs_(q - target)
-        new_priorities = loss.detach().cpu().numpy() + 1e-3
+        new_priorities = (loss.detach().cpu().numpy() + 1e-3).flatten()
         self.replay_memory.update_priorities(indexes, new_priorities)
         loss = (loss**2 * weights).mean()
         self.optimizer.zero_grad()

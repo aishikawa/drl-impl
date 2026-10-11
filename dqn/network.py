@@ -48,6 +48,6 @@ class DuelingNetwork(nn.Module):
         a = F.relu(a)
         a = self.afc2(a)
 
-        q = v + a - a.mean()
+        q = v + a - a.mean(dim=-1, keepdim=True)
 
         return q
