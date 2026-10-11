@@ -16,12 +16,12 @@ $ pip install -r requirements.txt
 ```
 
 ## Usage
-Run DQN for [LunarLander-v2](https://gymnasium.farama.org/environments/box2d/lunar_lander/)
+Run DQN for [LunarLander-v3](https://gymnasium.farama.org/environments/box2d/lunar_lander/)
 ```
 $ python run.py --algo DQN
 ```
 
-Run DDPG for [LunarLanderContinuous-v2](https://gymnasium.farama.org/environments/box2d/lunar_lander/)
+Run DDPG for LunarLanderContinuous-v3
 ```
 $ python run.py --algo DDPG
 ```
